@@ -1,0 +1,23 @@
+{
+    "name": "sugiphp/filesystem",
+    "type": "library",
+    "description": "Basic utilities to work with file system",
+    "keywords": ["files", "directories", "filesystem"],
+    "licence": "MIT",
+    "authors": [
+        {
+            "name": "Plamen Popov",
+            "email": "tzappa@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3"
+    },
+    "autoload": {
+        "psr-0": { 
+            "SugiPHP\\FileSystem\\": ""
+        }
+    },
+    "target-dir": "SugiPHP/FileSystem",
+    "minimum-stability": "dev"
+}
