@@ -7,14 +7,14 @@
  * @license    http://opensource.org/licenses/mit-license.php (MIT License)
  */
 
-namespace SugiPHP\FileSystem;
+use SugiPHP\FileSystem\Files as File;
 
-class FilesTests extends \PHPUnit_Framework_TestCase
+class FilesTests extends PHPUnit_Framework_TestCase
 {
 
 	public static function setUpBeforeClass()
 	{
-		@define("TESTFILE", __DIR__."/file.txt");
+		@define("TESTFILE", __DIR__.DIRECTORY_SEPARATOR."file.txt");
 	}
 
 	public function tearDown()
@@ -24,7 +24,7 @@ class FilesTests extends \PHPUnit_Framework_TestCase
 
 	public function testExists()
 	{
-		$file = new Files;
+		$file = new File();
 		$this->assertFileNotExists(TESTFILE);
 		$this->assertFalse($file->exists(TESTFILE));
 		file_put_contents(TESTFILE, "Hello World");
@@ -35,7 +35,7 @@ class FilesTests extends \PHPUnit_Framework_TestCase
 
 	public function testIsReadable()
 	{
-		$file = new Files;
+		$file = new File();
 		$this->assertTrue($file->isReadable(__FILE__));
 		$this->assertFalse($file->isReadable(TESTFILE));
 		file_put_contents(TESTFILE, "Hello World");
@@ -44,53 +44,69 @@ class FilesTests extends \PHPUnit_Framework_TestCase
 
 	public function testExtReturnsFileExtension()
 	{
-		$file = new Files;
+		$file = new File();
 		$this->assertEquals("php", $file->ext(__FILE__));
-		$this->assertEquals("php2", $file->ext(__FILE__."2"));
 		$this->assertEquals("", $file->ext(__DIR__));
+		$this->assertFalse($file->ext(__DIR__));
 	}
 
 	public function testGet()
 	{
-		$file = new Files;
+		$file = new File();
 		$this->assertNull($file->get(TESTFILE));
 		$this->assertEquals("default", $file->get(TESTFILE, "default"));
 		file_put_contents(TESTFILE, "Hello World");
 		$this->assertEquals("Hello World", $file->get(TESTFILE));
-		$this->assertNull($file->get(__DIR__)); // cannot get directory
+		// using read as an alias
+		$this->assertEquals("Hello World", $file->read(TESTFILE));
+		// cannot get directory
+		$this->assertNull($file->get(__DIR__));
 	}
 
 	public function testPut()
 	{
-		$file = new Files;
+		$file = new File();
 		$this->assertEquals(11, $file->put(TESTFILE, "Hello World"));
 		$this->assertFileExists(TESTFILE);
 		$this->assertEquals("Hello World", file_get_contents(TESTFILE));
-		$this->assertFalse($file->put(__DIR__, "test")); // cannot put in directory
+		// cannot put in directory
+		$this->assertFalse($file->put(__DIR__, "test"));
+		// using write as an alias of put
+		$this->assertEquals(11, $file->write(TESTFILE, "Hello World"));
 	}
 
 	public function testPutOnWriteProtectedFiles()
 	{
-		$file = new Files;
+		$file = new File();
 		file_put_contents(TESTFILE, "foo");
 		chmod(TESTFILE, 0444);
 		$this->assertFalse($file->put(TESTFILE, "Hello World"));
 		$this->assertEquals("foo", file_get_contents(TESTFILE));
 	}
 
+	/**
+	 * @expectedException PHPUnit_Framework_Error
+	 */
+	public function testPutWithChmod()
+	{
+		$file = new File();
+		$this->assertEquals(11, $file->put(TESTFILE, "Hello World", 0444));
+		$this->assertEquals("Hello World", file_get_contents(TESTFILE));
+		file_put_contents(TESTFILE, "foo");
+	}
+
 	public function testAppend()
 	{
-		$file = new Files;
+		$file = new File();
 		file_put_contents(TESTFILE, "Hello");
 		$this->assertEquals(6, $file->append(TESTFILE, " World"));
 		$this->assertEquals("Hello World", file_get_contents(TESTFILE));
 		$this->assertFalse($file->append(__DIR__, " World"));
 	}
 
-
 	public function testAppendOnWriteProtectedFiles()
 	{
-		$file = new Files;
+		$file = new File();
 		file_put_contents(TESTFILE, "Hello");
 		chmod(TESTFILE, 0444);
 		$this->assertFalse($file->append(TESTFILE, " World"));
@@ -99,14 +115,14 @@ class FilesTests extends \PHPUnit_Framework_TestCase
 
 	public function testAppendOnNonExistingFile()
 	{
-		$file = new Files;
-		$this->assertEquals(6, $file->append(TESTFILE, " World"));
-		$this->assertEquals(" World", file_get_contents(TESTFILE));
+		$file = new File();
+		$this->assertEquals(11, $file->append(TESTFILE, "Hello World"));
+		$this->assertEquals("Hello World", file_get_contents(TESTFILE));
 	}
 
 	public function testDelete()
 	{
-		$file = new Files;
+		$file = new File();
 		$this->assertTrue($file->delete(TESTFILE));
 		file_put_contents(TESTFILE, "Hello World");
 		$this->assertTrue($file->delete(TESTFILE));
@@ -115,10 +131,10 @@ class FilesTests extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * @expectedException PHPUnit_Framework_Error
-	 */	
+	 */
 	public function testChmod()
 	{
-		$file = new Files;
+		$file = new File();
 		file_put_contents(TESTFILE, "Hello World");
 		$this->assertTrue($file->chmod(TESTFILE, 0444));
 		file_put_contents(TESTFILE, "foo");
@@ -126,19 +142,25 @@ class FilesTests extends \PHPUnit_Framework_TestCase
 
 	public function testChmodFailures()
 	{
-		$file = new Files;
+		$file = new File();
 		$this->assertFalse($file->chmod(TESTFILE, 0444));
 		$this->assertFalse($file->chmod(__DIR__, 0775));
 	}
 
-	/**
-	 * @expectedException PHPUnit_Framework_Error
-	 */	
-	public function testPutWithChmod()
+	public function testChown()
 	{
-		$file = new Files;
-		$this->assertEquals(11, $file->put(TESTFILE, "Hello World", 0444));
-		$this->assertEquals("Hello World", file_get_contents(TESTFILE));
-		file_put_contents(TESTFILE, "foo");
+		$file = new File();
+		$this->assertFalse($file->chown(TESTFILE, $file->getUID(TESTFILE)));
+		touch(TESTFILE);
+		$this->assertTrue($file->chown(TESTFILE, $file->getUID(TESTFILE)));
 	}
+
+	public function testChgrp()
+	{
+		$file = new File();
+		$this->assertFalse($file->chown(TESTFILE, $file->getGID(TESTFILE)));
+		touch(TESTFILE);
+		$this->assertTrue($file->chown(TESTFILE, $file->getGID(TESTFILE)));
+	}
+
 }

@@ -69,10 +69,19 @@ class Files
 	}
 
 	/**
+	 * Alias of get
+	 * @see get()
+	 */
+	public function read($filename, $default = null)
+	{
+		return $this->get($filename, $default);
+	}
+
+	/**
 	 * Writes data in the file.
-	 * If the $mode parameter is set chmod will be made ONLY if 
+	 * If the $mode parameter is set chmod will be made ONLY if
 	 * the file did not exists before the operation.
-	 * 
+	 *
 	 * @param  string $filename
 	 * @param  string $data
 	 * @param  octal $mode Default null
@@ -85,6 +94,15 @@ class Files
 		$chmod && $this->chmod($filename, $mode);
 
 		return $res;
+	}
+
+	/**
+	 * Alias of put.
+	 * @see put()
+	 */
+	public function write($filename, $data, $mode = null)
+	{
+		return $this->put($filename, $data, $mode);
 	}
 
 	/**
@@ -104,12 +122,36 @@ class Files
 	 *
 	 * @param  string $filename
 	 * @param  octal $mode
-	 * @return boolean TRUE on success or FALSE on failure. 
+	 * @return boolean TRUE on success or FALSE on failure.
 	 */
 	public function chmod($filename, $mode)
 	{
 		// intentionally check $filename is a file not a path since chmod works also on paths
-		return /*preg_match('@^0[0-7]{3}$@', $mode) and*/ is_file($filename) and chmod($filename, $mode);
+		return /*preg_match('@^0[0-7]{3}$@', $mode) &&*/ is_file($filename) && @chmod($filename, $mode);
+	}
+
+	/**
+	 * Changes the owner of the file.
+	 *
+	 * @param  string  $files
+	 * @param  mixed   $user A user name or number.
+	 * @return boolean
+	 */
+	public function chown($filename, $user)
+	{
+		return is_file($filename) && @chown($filename, $user);
+	}
+
+	/**
+	 * Changes file group.
+	 *
+	 * @param  string $filename
+	 * @param  mixed   $group A group name or number.
+	 * @return boolean
+	 */
+	public function chgrp($filename, $group)
+	{
+		return is_file($filename) && @chgrp($filename, $group);
 	}
 
 	/**
@@ -120,26 +162,58 @@ class Files
 	 */
 	public function modified($filename)
 	{
-		return @filemtime($filename);
+		return is_file($filename) ? @filemtime($filename) : false;
 	}
 
-	/** 
+	/**
 	 * Extracts file extension from the name of the file.
-	 * Note that the function will return extension even 
-	 * if the file doesn't exists or it is actually a directory!
 	 *
 	 * @param  string $filename
-	 * @return string
+	 * @return string of FALSE on failure (file does not exists)
 	 */
 	public function ext($filename)
 	{
-		return pathinfo($filename, PATHINFO_EXTENSION);
+		return is_file($filename) ? pathinfo($filename, PATHINFO_EXTENSION) : false;
 	}
+
+	/**
+	 * Returns owner's user id.
+	 *
+	 * @param  string $filename
+	 * @return integer or FALSE on failure
+	 */
+	public function getUID($filename)
+	{
+		if (!is_file($filename)) {
+			return false;
+		}
+		$stat = stat($filename);
+
+		return $stat["uid"];
+	}
+
+	/**
+	 * Returns group owner id.
+	 *
+	 * @param  string $filename
+	 * @return integer or FALSE on failure
+	 */
+	public function getGID($filename)
+	{
+		if (!is_file($filename)) {
+			return false;
+		}
+		$stat = stat($filename);
+
+		return $stat["gid"];
+	}
+
+
 
 	/**
 	 * Deletes a file.
 	 * If the file does not exists returns true
-	 * 
+	 *
 	 * @param  string $filename
 	 * @return boolean
 	 */
