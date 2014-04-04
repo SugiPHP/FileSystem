@@ -48,6 +48,18 @@ class Directories
 	}
 
 	/**
+	 * Recursively create directory.
+	 *
+	 * @param  string  $dir
+	 * @param  integer $mode
+	 * @return boolean
+	 */
+	public function mkdir($dir, $mode = 0777)
+	{
+		return @mkdir($dir, $mode, true);
+	}
+
+	/**
 	 * Changes directory mode.
 	 *
 	 * @param  string  $dir Directory name

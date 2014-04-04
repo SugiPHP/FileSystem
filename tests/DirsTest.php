@@ -21,9 +21,9 @@ class DirsTest extends PHPUnit_Framework_TestCase
 
 	public function tearDown()
 	{
+		@unlink(TESTFILE);
 		@rmdir(TESTDIR);
 		@rmdir(TESTDIRSLASH);
-		@unlink(TESTFILE);
 	}
 
 	public function testExists()
@@ -82,6 +82,29 @@ class DirsTest extends PHPUnit_Framework_TestCase
 		// checking is not writable
 		$this->assertFalse($dir->isWritable(TESTDIR));
 	}
+
+	public function testMkDir()
+	{
+		$dir = new Dir();
+		// directory does not exists
+		$this->assertFalse(is_dir(TESTDIR));
+		$dir->mkdir(TESTDIR);
+		$this->assertTrue(is_dir(TESTDIR));
+	}
+
+	public function testMkDirRecursively()
+	{
+		$d = __DIR__.DIRECTORY_SEPARATOR."levelone".DIRECTORY_SEPARATOR."secondlevel";
+		$dir = new Dir();
+		// directory does not exists
+		$this->assertFalse(is_dir($d));
+		$dir->mkdir($d);
+		$this->assertTrue(is_dir($d));
+		rmdir($d);
+		rmdir(dirname($d));
+	}
+
+
 
 	public function testChmod()
 	{

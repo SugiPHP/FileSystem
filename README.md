@@ -102,5 +102,8 @@ $dir->isWritable($name);
 // Change mode for directories.
 $dir->chmod($name, 0755);
 
+// Creates directory recursively.
+$dir->mkdir($name);
+
 ?>
 ```
