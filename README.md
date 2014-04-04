@@ -41,6 +41,9 @@ $bytes_written = $file->write($filename, $data, $mode = null);
 // Returns FALSE if operation fails.
 $bytes_appended = $file->append($filename, $data);
 
+// Deletes a file. Returns TRUE if the file is successfully removed or didn't exists.
+$file->delete($filename);
+
 // Change mode for files. Returns FALSE on error.
 $file->chmod($filename, 0664);
 
@@ -53,23 +56,28 @@ $file->chown($filename, $user);
 $file->chgrp($filename, $group);
 
 // Get extension of the file. Returns false if the file does not exists
-$file_extension = $file->ext($filename);
+$file->ext($filename);
 
 // Returns owner's user ID.
 $file->getUID($filename)
 
+// Returns owner's name
+$file->getOwner($filanme)
+
 // Returns group ID
 $file->getGID($filename)
 
+// Returns group name
+$file->getGroup($filename)
+
+// Gets file modification time
+$file->mtime($filename)
+
 // TODO:
-// getUser($filename)
-// getGroup($filename)
-// modified()
-// created()
 // copy()
-// move() or rename()
-// delete()
+// move()
 // symlink()
+// touch()
 ?>
 
 ```

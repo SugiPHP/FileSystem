@@ -155,14 +155,22 @@ class Files
 	}
 
 	/**
-	 * Gets last modification time of the file
+	 * Gets last modification time of the file.
 	 *
 	 * @param  string $filename
 	 * @return integer or FALSE on failure (e.g. file does not exists)
 	 */
-	public function modified($filename)
+	public function mtime($filename)
 	{
 		return is_file($filename) ? @filemtime($filename) : false;
+	}
+
+	/**
+	 * @see mtime()
+	 */
+	public function modified($filename)
+	{
+		return $this->mtime($filename);
 	}
 
 	/**
@@ -187,9 +195,24 @@ class Files
 		if (!is_file($filename)) {
 			return false;
 		}
-		$stat = stat($filename);
 
-		return $stat["uid"];
+		return fileowner($filename);
+	}
+
+	/**
+	 * Returns owner's name
+	 *
+	 * @param  string $filename
+	 * @return string Username or FALSE on failure
+	 */
+	public function getOwner($filename)
+	{
+		if (!is_file($filename)) {
+			return false;
+		}
+		$info = posix_getpwuid(fileowner($filename));
+
+		return $info["name"];
 	}
 
 	/**
@@ -203,21 +226,38 @@ class Files
 		if (!is_file($filename)) {
 			return false;
 		}
-		$stat = stat($filename);
 
-		return $stat["gid"];
+		return filegroup($filename);
 	}
 
+	/**
+	 * Returns group name.
+	 *
+	 * @param  string $filename
+	 * @return string or FALSE on failure
+	 */
+	public function getGroup($filename)
+	{
+		if (!is_file($filename)) {
+			return false;
+		}
+		$info = posix_getpwuid(filegroup($filename));
 
+		return $info["name"];
+	}
 
 	/**
 	 * Deletes a file.
-	 * If the file does not exists returns true
 	 *
-	 * @param  string $filename
-	 * @return boolean
+	 * @param  string  $filename
+	 * @return boolean Returns TRUE if the file is deleted or did not exists.
 	 */
-	public function delete($filename) {
-		return is_file($filename) ? @unlink($filename) : true;
+	public function delete($filename)
+	{
+		if (is_file($filename)) {
+			@unlink($filename);
+		}
+
+		return !file_exists($filename);
 	}
 }

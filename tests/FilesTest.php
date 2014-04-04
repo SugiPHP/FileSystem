@@ -129,6 +129,53 @@ class FilesTests extends PHPUnit_Framework_TestCase
 		$this->assertFalse(file_exists(TESTFILE));
 	}
 
+	public function testMtime()
+	{
+		$file = new File();
+		$this->assertFalse($file->mtime(TESTFILE));
+		file_put_contents(TESTFILE, "Hello World");
+		$this->assertNotEmpty($file->mtime(TESTFILE));
+		$this->assertInternalType("integer", $file->mtime(TESTFILE));
+	}
+
+	public function testGetUID()
+	{
+		$file = new File();
+		// File does not exists
+		$this->assertFalse($file->getUID(TESTFILE));
+		file_put_contents(TESTFILE, "Hello World");
+		$this->assertInternalType("integer", $file->getUID(TESTFILE));
+	}
+
+	public function testGetOwner()
+	{
+		$file = new File();
+		// File does not exists
+		$this->assertFalse($file->getOwner(TESTFILE));
+		file_put_contents(TESTFILE, "Hello World");
+		$this->assertNotEmpty($file->getOwner(TESTFILE));
+		$this->assertInternalType("string", $file->getOwner(TESTFILE));
+	}
+
+	public function testGetGID()
+	{
+		$file = new File();
+		// File does not exists
+		$this->assertFalse($file->getGID(TESTFILE));
+		file_put_contents(TESTFILE, "Hello World");
+		$this->assertInternalType("integer", $file->getGID(TESTFILE));
+	}
+
+	public function testGetGroup()
+	{
+		$file = new File();
+		// File does not exists
+		$this->assertFalse($file->getGroup(TESTFILE));
+		file_put_contents(TESTFILE, "Hello World");
+		$this->assertNotEmpty($file->getGroup(TESTFILE));
+		$this->assertInternalType("string", $file->getGroup(TESTFILE));
+	}
+
 	/**
 	 * @expectedException PHPUnit_Framework_Error
 	 */
@@ -153,6 +200,7 @@ class FilesTests extends PHPUnit_Framework_TestCase
 		$this->assertFalse($file->chown(TESTFILE, $file->getUID(TESTFILE)));
 		touch(TESTFILE);
 		$this->assertTrue($file->chown(TESTFILE, $file->getUID(TESTFILE)));
+		$this->assertTrue($file->chown(TESTFILE, $file->getOwner(TESTFILE)));
 	}
 
 	public function testChgrp()
@@ -161,6 +209,7 @@ class FilesTests extends PHPUnit_Framework_TestCase
 		$this->assertFalse($file->chown(TESTFILE, $file->getGID(TESTFILE)));
 		touch(TESTFILE);
 		$this->assertTrue($file->chown(TESTFILE, $file->getGID(TESTFILE)));
+		$this->assertTrue($file->chown(TESTFILE, $file->getGroup(TESTFILE)));
 	}
 
 }
