@@ -88,8 +88,10 @@ class DirsTest extends PHPUnit_Framework_TestCase
 		$dir = new Dir();
 		// directory does not exists
 		$this->assertFalse(is_dir(TESTDIR));
-		$dir->mkdir(TESTDIR);
+		$this->assertTrue($dir->mkdir(TESTDIR));
 		$this->assertTrue(is_dir(TESTDIR));
+		// if the directory is already created return TRUE
+		$this->assertTrue($dir->mkdir(TESTDIR));
 	}
 
 	public function testMkDirRecursively()

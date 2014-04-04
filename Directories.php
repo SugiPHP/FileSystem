@@ -49,13 +49,18 @@ class Directories
 
 	/**
 	 * Recursively create directory.
+	 * If the directory is already created returns TRUE.
 	 *
 	 * @param  string  $dir
 	 * @param  integer $mode
-	 * @return boolean
+	 * @return boolean Returns FALSE on failure
 	 */
 	public function mkdir($dir, $mode = 0777)
 	{
+		if (is_dir($dir)) {
+			return true;
+		}
+
 		return @mkdir($dir, $mode, true);
 	}
 

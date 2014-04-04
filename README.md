@@ -103,6 +103,8 @@ $dir->isWritable($name);
 $dir->chmod($name, 0755);
 
 // Creates directory recursively.
+// If the directory is already created returns TRUE.
+// Returns FALSE on failure
 $dir->mkdir($name);
 
 ?>
