@@ -15,10 +15,12 @@ class FilesTests extends PHPUnit_Framework_TestCase
 	public static function setUpBeforeClass()
 	{
 		@define("TESTFILE", __DIR__.DIRECTORY_SEPARATOR."file.txt");
+		@define("TESTFILE2", __DIR__.DIRECTORY_SEPARATOR."file2.txt");
 	}
 
 	public function tearDown()
 	{
+		@unlink(TESTFILE2);
 		@unlink(TESTFILE);
 	}
 
@@ -212,4 +214,17 @@ class FilesTests extends PHPUnit_Framework_TestCase
 		$this->assertTrue($file->chown(TESTFILE, $file->getGroup(TESTFILE)));
 	}
 
+	public function testCopy()
+	{
+		$file = new File();
+		$file->write(TESTFILE, "Hi there");
+		$this->assertTrue($file->copy(TESTFILE, TESTFILE2));
+		$this->assertTrue(file_exists(TESTFILE2));
+		$this->assertEquals("Hi there", $file->read(TESTFILE2));
+		$file->write(TESTFILE, "Something different");
+		$this->assertFalse($file->copy(TESTFILE, TESTFILE2));
+		$this->assertEquals("Hi there", $file->read(TESTFILE2));
+		$this->assertTrue($file->copy(TESTFILE, TESTFILE2, true));
+		$this->assertEquals("Something different", $file->read(TESTFILE2));
+	}
 }

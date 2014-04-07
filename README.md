@@ -73,8 +73,10 @@ $file->getGroup($filename)
 // Gets file modification time
 $file->mtime($filename)
 
+// Copy file. Returns TRUE if copy is successful.
+$file->copy($source, $destination, $override = false);
+
 // TODO:
-// copy()
 // move()
 // symlink()
 // touch()

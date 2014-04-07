@@ -8,6 +8,8 @@
 
 namespace SugiPHP\FileSystem;
 
+use SugiPHP\FileSystem\Directories;
+
 /**
  * Files - Helper functions to ease file specific operations.
  * Directory operations are intentionally avoided.
@@ -115,6 +117,45 @@ class Files
 	public function append($filename, $data)
 	{
 		return @file_put_contents($filename, $data, LOCK_EX | FILE_APPEND);
+	}
+
+	/**
+	 * Copy a file.
+	 *
+	 * @param string  $source
+	 * @param string  $destination
+	 * @param boolean $override TRUE to overrides destination file if it exists
+	 */
+	public function copy($source, $destination, $override = false)
+	{
+		if (!$this->isReadable($source)) {
+			return false;
+		}
+
+		if ($this->exists($destination) && !$override) {
+			return false;
+		}
+
+		// make sure the directory exists!
+		$dir = new Directories();
+		$dir->mkdir(dirname($destination));
+
+		return @copy($source, $destination);
+	}
+
+	/**
+	 * Deletes a file.
+	 *
+	 * @param  string  $filename
+	 * @return boolean Returns TRUE if the file is deleted or did not exists.
+	 */
+	public function delete($filename)
+	{
+		if (is_file($filename)) {
+			@unlink($filename);
+		}
+
+		return !file_exists($filename);
 	}
 
 	/**
@@ -244,20 +285,5 @@ class Files
 		$info = posix_getpwuid(filegroup($filename));
 
 		return $info["name"];
-	}
-
-	/**
-	 * Deletes a file.
-	 *
-	 * @param  string  $filename
-	 * @return boolean Returns TRUE if the file is deleted or did not exists.
-	 */
-	public function delete($filename)
-	{
-		if (is_file($filename)) {
-			@unlink($filename);
-		}
-
-		return !file_exists($filename);
 	}
 }
