@@ -122,17 +122,18 @@ class Files
 	/**
 	 * Copy a file.
 	 *
-	 * @param string  $source
-	 * @param string  $destination
-	 * @param boolean $override TRUE to overrides destination file if it exists
+	 * @param  string  $source Source file name
+	 * @param  string  $destination Target file name
+	 * @param  boolean $overwrite TRUE to overrides destination file if it exists
+	 * @return boolean TRUE if the copy succeeds
 	 */
-	public function copy($source, $destination, $override = false)
+	public function copy($source, $destination, $overwrite = false)
 	{
-		if (!$this->isReadable($source)) {
+		if (!$this->exists($source)) {
 			return false;
 		}
 
-		if ($this->exists($destination) && !$override) {
+		if ($this->exists($destination) && !$overwrite) {
 			return false;
 		}
 
@@ -141,6 +142,39 @@ class Files
 		$dir->mkdir(dirname($destination));
 
 		return @copy($source, $destination);
+	}
+
+	/**
+	 * Renames / moves a file.
+	 *
+	 * @param  string  $source Source file name
+	 * @param  string  $destination Target file name
+	 * @param  boolean $overwrite TRUE to overrides destination file if it exists
+	 * @return boolean TRUE if move succeeds
+	 */
+	public function move($source, $destination, $overwrite = false)
+	{
+		if (!$this->exists($source)) {
+			return false;
+		}
+
+		if ($this->exists($destination) && !$overwrite) {
+			return false;
+		}
+
+		// make sure the directory exists!
+		$dir = new Directories();
+		$dir->mkdir(dirname($destination));
+
+		return @rename($source, $destination);
+	}
+
+	/**
+	 * @see move();
+	 */
+	public function rename($source, $destination, $overwrite = false)
+	{
+		return $this->move($source, $destination, $overwrite);
 	}
 
 	/**

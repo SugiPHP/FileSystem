@@ -74,10 +74,12 @@ $file->getGroup($filename)
 $file->mtime($filename)
 
 // Copy file. Returns TRUE if copy is successful.
-$file->copy($source, $destination, $override = false);
+$file->copy($source, $destination, $overwrite = false);
+
+// Renames / moves a file.
+$file->move($source, $destination, $overwrite = false);
 
 // TODO:
-// move()
 // symlink()
 // touch()
 ?>

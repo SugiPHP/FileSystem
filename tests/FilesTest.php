@@ -227,4 +227,20 @@ class FilesTests extends PHPUnit_Framework_TestCase
 		$this->assertTrue($file->copy(TESTFILE, TESTFILE2, true));
 		$this->assertEquals("Something different", $file->read(TESTFILE2));
 	}
+
+	public function testMove()
+	{
+		$file = new File();
+		$file->write(TESTFILE, "Hi there");
+		$this->assertTrue($file->move(TESTFILE, TESTFILE2));
+		$this->assertTrue(file_exists(TESTFILE2));
+		$this->assertEquals("Hi there", $file->read(TESTFILE2));
+		$this->assertFalse(file_exists(TESTFILE));
+		$file->write(TESTFILE, "Something different");
+		$this->assertFalse($file->move(TESTFILE, TESTFILE2));
+		$this->assertEquals("Hi there", $file->read(TESTFILE2));
+		$this->assertTrue($file->move(TESTFILE, TESTFILE2, true));
+		$this->assertEquals("Something different", $file->read(TESTFILE2));
+		$this->assertFalse(file_exists(TESTFILE));
+	}
 }
