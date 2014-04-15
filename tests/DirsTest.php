@@ -106,8 +106,6 @@ class DirsTest extends PHPUnit_Framework_TestCase
 		rmdir(dirname($d));
 	}
 
-
-
 	public function testChmod()
 	{
 		$dir = new Dir();

@@ -217,30 +217,54 @@ class FilesTests extends PHPUnit_Framework_TestCase
 	public function testCopy()
 	{
 		$file = new File();
-		$file->write(TESTFILE, "Hi there");
-		$this->assertTrue($file->copy(TESTFILE, TESTFILE2));
-		$this->assertTrue(file_exists(TESTFILE2));
-		$this->assertEquals("Hi there", $file->read(TESTFILE2));
-		$file->write(TESTFILE, "Something different");
+		// copy an unexisting file
 		$this->assertFalse($file->copy(TESTFILE, TESTFILE2));
+		// making source file
+		$file->write(TESTFILE, "Hi there");
+		// copy
+		$this->assertTrue($file->copy(TESTFILE, TESTFILE2));
+		// check new file exists
+		$this->assertTrue(file_exists(TESTFILE2));
+		// check contents
 		$this->assertEquals("Hi there", $file->read(TESTFILE2));
+		// change contents for original file
+		$file->write(TESTFILE, "Something different");
+		// copy it (no overwrite)
+		$this->assertFalse($file->copy(TESTFILE, TESTFILE2));
+		// check it's still old one
+		$this->assertEquals("Hi there", $file->read(TESTFILE2));
+		// overwrite it
 		$this->assertTrue($file->copy(TESTFILE, TESTFILE2, true));
+		// check the contents is new
 		$this->assertEquals("Something different", $file->read(TESTFILE2));
 	}
 
 	public function testMove()
 	{
 		$file = new File();
-		$file->write(TESTFILE, "Hi there");
-		$this->assertTrue($file->move(TESTFILE, TESTFILE2));
-		$this->assertTrue(file_exists(TESTFILE2));
-		$this->assertEquals("Hi there", $file->read(TESTFILE2));
-		$this->assertFalse(file_exists(TESTFILE));
-		$file->write(TESTFILE, "Something different");
+		// move an unexisting file
 		$this->assertFalse($file->move(TESTFILE, TESTFILE2));
+		// making source file
+		$file->write(TESTFILE, "Hi there");
+		// move it
+		$this->assertTrue($file->move(TESTFILE, TESTFILE2));
+		// check the file is moved
+		$this->assertTrue(file_exists(TESTFILE2));
+		// check contents
 		$this->assertEquals("Hi there", $file->read(TESTFILE2));
+		// check source file is gone
+		$this->assertFalse(file_exists(TESTFILE));
+		// make a new source file
+		$file->write(TESTFILE, "Something different");
+		// move it (no overwrite)
+		$this->assertFalse($file->move(TESTFILE, TESTFILE2));
+		// check it's still old one
+		$this->assertEquals("Hi there", $file->read(TESTFILE2));
+		// move it (overwrite)
 		$this->assertTrue($file->move(TESTFILE, TESTFILE2, true));
+		// test it's a new
 		$this->assertEquals("Something different", $file->read(TESTFILE2));
+		// test original file is gone
 		$this->assertFalse(file_exists(TESTFILE));
 	}
 }
