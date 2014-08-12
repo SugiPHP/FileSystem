@@ -208,7 +208,7 @@ class Files
 	/**
 	 * Changes the owner of the file.
 	 *
-	 * @param  string  $files
+	 * @param  string  $filename
 	 * @param  mixed   $user A user name or number.
 	 * @return boolean
 	 */

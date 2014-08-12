@@ -1,6 +1,8 @@
 FileSystem
 ==========
 
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/SugiPHP/FileSystem/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/SugiPHP/FileSystem/?branch=master)
+
 Helper functions to work with the file system.
 
 Files
