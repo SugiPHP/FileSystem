@@ -7,7 +7,7 @@
  * @license    http://opensource.org/licenses/mit-license.php (MIT License)
  */
 
-namespace SugiPHP\FileSystem\Test;
+namespace SugiPHP\FileSystem;
 
 use SugiPHP\FileSystem\Directories as Dir;
 use PHPUnit_Framework_TestCase;
